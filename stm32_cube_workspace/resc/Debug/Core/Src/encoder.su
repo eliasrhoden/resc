@@ -1,0 +1,4 @@
+../Core/Src/encoder.c:25:6:encoder_init	8	static
+../Core/Src/encoder.c:38:6:encoder_set_zero	4	static
+../Core/Src/encoder.c:43:6:encoder_task	8	static
+../Core/Src/encoder.c:54:6:encoder_update	24	static

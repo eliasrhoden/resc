@@ -1,0 +1,132 @@
+
+#include "ServoCtrl.h"
+#include <math.h>
+
+#define deg2rad 0.0174532925f
+#define pi_23 2.09439510239f
+#define sqrt_23 0.81649658092f
+
+
+
+void update_park(float theta){
+
+    // Todo update park trafo matrices
+
+    float sin_th0, sin_th1, sin_th2;
+    float cos_th0, cos_th1, cos_th2;
+
+    sin_th0 = sinf(theta);
+    sin_th1 = sinf(theta - pi_23);
+    sin_th2 = sinf(theta + pi_23);
+
+    cos_th0 = cosf(theta);
+    cos_th1 = cosf(theta - pi_23);
+    cos_th2 = cosf(theta + pi_23);
+
+    // TRAFO D,Q -> U,V,W
+    park_mat[0][0] = 0.66666667f*cos_th0;
+    park_mat[0][1] = -0.66666667f*sin_th0;
+    park_mat[0][2] = 0.33333333f;
+
+    park_mat[1][0] = -0.33333333f*cos_th0 + 0.57735027f*sin_th0;
+    park_mat[1][1] = 0.33333333f*sin_th0 + 0.57735027f*cos_th0;
+    park_mat[1][2] = 0.33333333f;
+
+    park_mat[2][0] = -0.33333333f*cos_th0 - 0.57735027*sin_th0;
+    park_mat[2][1] = 0.33333333f*sin_th0 - 0.57735027f*cos_th0;
+    park_mat[2][2] = 0.33333333f;
+
+    // TRAFO U,V,W -> D,Q
+    //park_inv_mat[0][0] = sin;
+    park_inv_mat[0][1] = 0;
+
+    park_inv_mat[1][0] = 0;
+    park_inv_mat[1][1] = 0;
+
+    park_inv_mat[2][0] = 0;
+    park_inv_mat[2][1] = 0;
+
+}
+
+    //*U = sin_th0*D + cos_th0*Q;
+    //*V = sin_th1*D + cos_th1*Q;
+    //*W = sin_th2*D + cos_th2*Q;
+
+    //*U = (*U)*sqrt_23;
+    //*V = (*V)*sqrt_23;
+    //*W = (*W)*sqrt_23;
+
+/*
+void park_trafo(float Ud, float Uq, float theta, float* U, float* V, float* W){
+
+	float U_alpha = cosf(theta)*Ud - sinf(theta)*Uq;
+	float U_beta = sinf(theta)*Ud + cosf(theta)*Uq;
+
+	float offset = 0.5;
+
+	/*
+	 * U_alpha,U_Beta -> U,V,W
+	 * [ 0.66666667,  0.        ,  0.33333333],
+		   [-0.33333333,  0.57735027,  0.33333333],
+		   [-0.33333333, -0.57735027,  0.33333333]
+	 * */
+
+    /*
+	float Un = 0.66666667*U_alpha + 0.33333333;
+	float Vn = -0.33333333*U_alpha +   0.57735027*U_beta + 0.33333333;
+	float Wn = -0.33333333*U_alpha -0.57735027*U_beta +   0.33333333;
+
+    *U = Un*0.5 + offset;
+    *V = Vn*0.5 + offset;
+    *W = Wn*0.5 + offset;
+}
+*/
+
+void inv_park_trafo(float D, float Q, float theta, float* U, float* V, float* W){
+
+    float sin_th0, sin_th1, sin_th2;
+    float cos_th0, cos_th1, cos_th2;
+
+    sin_th0 = sinf(theta);
+    sin_th1 = sinf(theta - pi_23);
+    sin_th2 = sinf(theta + pi_23);
+
+    cos_th0 = cosf(theta);
+    cos_th1 = cosf(theta - pi_23);
+    cos_th2 = cosf(theta + pi_23);
+
+    *U = sin_th0*D + cos_th0*Q;
+    *V = sin_th1*D + cos_th1*Q;
+    *W = sin_th2*D + cos_th2*Q;
+
+    *U = (*U)*sqrt_23;
+    *V = (*V)*sqrt_23;
+    *W = (*W)*sqrt_23;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+void servo_ctrl(ServoCtrl_IN * in, ServoCtrl_OUT * out){
+
+
+    static float old_theta;
+
+    out->rotor_vel = in->rotor_ang - old_theta;
+
+    old_theta = in->rotor_ang;
+
+
+
+}
+

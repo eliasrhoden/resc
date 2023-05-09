@@ -1,0 +1,1 @@
+gcc -shared -o sim_out/resc_ctrl.so -fPIC stm32_cube_workspace/resc/resc/src/* -I stm32_cube_workspace/resc/resc/inc/

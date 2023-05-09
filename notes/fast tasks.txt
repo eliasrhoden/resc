@@ -1,0 +1,4 @@
+frertos has a maximum ticrate of 1k Hz.
+Should mean that we cant have a delay smaller that 1ms.
+
+Move current ctrl to timer interupt.

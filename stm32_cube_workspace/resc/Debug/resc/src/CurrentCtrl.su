@@ -1,0 +1,2 @@
+../resc/src/CurrentCtrl.c:30:6:elec_offset_search	64	static
+../resc/src/CurrentCtrl.c:153:15:current_ctrl	16	static

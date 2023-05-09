@@ -1,0 +1,3 @@
+../resc/src/ServoCtrl.c:13:6:update_park	48	static
+../resc/src/ServoCtrl.c:87:6:inv_park_trafo	56	static
+../resc/src/ServoCtrl.c:122:6:servo_ctrl	16	static

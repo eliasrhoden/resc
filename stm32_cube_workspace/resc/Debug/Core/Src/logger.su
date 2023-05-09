@@ -1,0 +1,5 @@
+../Core/Src/logger.c:32:6:HAL_UART_RxCpltCallback	16	static
+../Core/Src/logger.c:37:6:HAL_UART_TxCpltCallback	16	static
+../Core/Src/logger.c:46:6:wait_for_host	40	static
+../Core/Src/logger.c:81:6:logger_task	24	static
+../Core/Src/logger.c:130:6:update_log_signal	16	static

@@ -1,0 +1,7 @@
+../Core/Src/motor.c:45:6:mtr_init	8	static
+../Core/Src/motor.c:77:6:HAL_ADC_ConvCpltCallback	16	static
+../Core/Src/motor.c:94:7:limit_duty	16	static
+../Core/Src/motor.c:112:6:mtr_current_ctrl_step	8	static
+../Core/Src/motor.c:161:6:mtr_set_U	24	static
+../Core/Src/motor.c:172:6:mtr_set_V	24	static
+../Core/Src/motor.c:183:6:mtr_set_W	24	static

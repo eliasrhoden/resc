@@ -1,0 +1,10 @@
+../Core/Src/AS5601.c:16:6:as5601_init	16	static
+../Core/Src/AS5601.c:30:9:read_bytes	32	static
+../Core/Src/AS5601.c:46:10:get_int_from_2bytes	16	static
+../Core/Src/AS5601.c:51:6:read_status	24	static
+../Core/Src/AS5601.c:79:6:read_output_old	24	static
+../Core/Src/AS5601.c:98:6:read_output	24	static
+../Core/Src/AS5601.c:118:6:read_conf	24	static
+../Core/Src/AS5601.c:172:6:set_update_rate	32	static
+../Core/Src/AS5601.c:194:6:set_zero_power_mode	24	static
+../Core/Src/AS5601.c:220:6:write_fast_filter	16	static
