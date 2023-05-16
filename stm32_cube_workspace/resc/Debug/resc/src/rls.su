@@ -1,8 +1,0 @@
-../resc/src/rls.c:4:6:inv_2_mat	24	static
-../resc/src/rls.c:17:6:mat_times_vec2	24	static
-../resc/src/rls.c:24:6:mat_times_mat2	24	static
-../resc/src/rls.c:36:6:compute_K2	32	static
-../resc/src/rls.c:50:6:compute_P	48	static
-../resc/src/rls.c:69:6:compute_theta	40	static
-../resc/src/rls.c:81:6:rls_step	64	static
-../resc/src/rls.c:100:6:reset_rls	24	static
