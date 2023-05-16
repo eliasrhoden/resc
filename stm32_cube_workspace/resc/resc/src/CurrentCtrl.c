@@ -11,7 +11,7 @@
 
 
 int elec_search_status = 0;
-/* 
+/*
 0 = Not started
 1 = Working first dir
 2 = Working second dir
@@ -92,7 +92,7 @@ void elec_offset_search(CurrCtrl_IN * in, CurrCtrl_OUT * out){
             elec_search_status = 3;
 
             // Compute no polepairs and enc offset
-            
+
             float n_polepairs = 0.5*(theta_pos[0] + theta_min[0]);
             n_polepairs = round(n_polepairs);
             float elec_offs = 0.5*(theta_pos[1] + theta_min[1]);
@@ -121,8 +121,8 @@ void elec_offset_search(CurrCtrl_IN * in, CurrCtrl_OUT * out){
     //out->debug3 = theta_min[1];
 
 
-    //out->debug2 = elec_theta;
-    //out->debug3 = n_polepairs;
+    out->debug0 = elec_theta;
+    out->debug1 = in->rotor_ang;
 
 
     if(elec_search_status== 1 || elec_search_status == 2){

@@ -1,6 +1,6 @@
 
 
-import numpy as np 
+import numpy as np
 import dataclasses
 from scipy import integrate
 import typing
@@ -19,7 +19,7 @@ class Motor:
     d:float # damping
 
     def current_torque(self,Id, Iq):
-        return 3/2*self.N*Iq*self.lam 
+        return 3/2*self.N*Iq*self.lam
 
     def currents(self,Ud,Uq,omega):
 
@@ -65,6 +65,9 @@ def inv_park_trafo(d,q,theta):
 
     return Y
 
+def wrap_angle(x):
+    n = int(x/(np.pi*2))
+    return x - n*2*np.pi
 
 def sim(mtr:Motor, ts, N_sc, N_tg, Tf,resc:RescTasks):
 
@@ -75,6 +78,7 @@ def sim(mtr:Motor, ts, N_sc, N_tg, Tf,resc:RescTasks):
 
     # inital state
     Y = np.zeros(4)
+    Y[3] = 4.1337 # Inital angle
 
     # I/O
     traj_in = c_functions.TrajGen_IN(0)
@@ -86,30 +90,30 @@ def sim(mtr:Motor, ts, N_sc, N_tg, Tf,resc:RescTasks):
     curr_in = c_functions.CurrCtrl_IN(0.0,0.0,0.0,0.0,0)
     curr_out = c_functions.CurrCtrl_OUT(0.0,0.0,0.0,0.0)
 
-    curr_in.current_ctrl_cmd = 0;
+    curr_in.current_ctrl_cmd = 0
 
     for i in tqdm(range(N)):
-        ti = ts*i 
+        ti = ts*i
 
         if i == 5:
             curr_in.current_ctrl_cmd = 1 # Enable DQ-offset search
 
         # Unpack "true states"
-        Id,Iq,omega,theta = Y 
+        Id,Iq,omega,theta = Y
         theta_elec = theta*mtr.N
         IU,IV,IW = inv_park_trafo(Id,Iq, theta_elec)
 
         # If trajectory generation run this step
         if i % N_tg == 0:
             resc.traj_gen(traj_in, traj_out)
-        
+
         # If servo ctrl run this step
         if i % N_sc == 0:
             servo_in.ref_acc = traj_out.ref_acc
             servo_in.ref_vel = traj_out.ref_vel
             servo_in.ref_pos = traj_out.ref_pos
-            servo_in.rotor_ang = theta + np.deg2rad(13.37)
-            resc.servo_ctrl(servo_in, servo_out) 
+            servo_in.rotor_ang = wrap_angle(theta + np.deg2rad(13.37))
+            resc.servo_ctrl(servo_in, servo_out)
 
         if curr_in.current_ctrl_cmd == 2:
             servo_out.ref_Id = 0
@@ -118,8 +122,8 @@ def sim(mtr:Motor, ts, N_sc, N_tg, Tf,resc:RescTasks):
         curr_in.rotor_ang = servo_in.rotor_ang
         curr_in.rotor_vel = servo_out.rotor_vel
 
-        curr_in.Iu = IU 
-        curr_in.Iv = IV 
+        curr_in.Iu = IU
+        curr_in.Iv = IV
         curr_in.Iw = IW
 
         curr_in.ref_Id = servo_out.ref_Id
@@ -131,7 +135,7 @@ def sim(mtr:Motor, ts, N_sc, N_tg, Tf,resc:RescTasks):
 
         #UU,UV = UV,UU
 
-        #UU -= 0.3 
+        #UU -= 0.3
         #UV -= 0.3
         #UW -= 0.3
 
@@ -164,13 +168,13 @@ def sim(mtr:Motor, ts, N_sc, N_tg, Tf,resc:RescTasks):
 
 def plot_sim_res(Y):
     t = Y[:,0]
-    Id = Y[:,1] 
-    Iq = Y[:,2] 
-    omega = Y[:,3] 
-    T = Y[:,4] 
-    UU = Y[:,5] 
-    UV  = Y[:,6] 
-    UW  = Y[:,7] 
+    Id = Y[:,1]
+    Iq = Y[:,2]
+    omega = Y[:,3]
+    T = Y[:,4]
+    UU = Y[:,5]
+    UV  = Y[:,6]
+    UW  = Y[:,7]
     theta  = Y[:,8]
     IU = Y[:,9]
     IV = Y[:,10]
