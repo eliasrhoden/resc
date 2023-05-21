@@ -25,8 +25,6 @@ float tick = 0;
 float theta_pos[2], P_pos[4];
 float theta_min[2], P_min[4];
 
-
-
 void elec_offset_search(CurrCtrl_IN * in, CurrCtrl_OUT * out){
 
     float phi[2];
@@ -145,22 +143,74 @@ void elec_offset_search(CurrCtrl_IN * in, CurrCtrl_OUT * out){
 
 }
 
+float saturation(float x, float x_lim){
+    if(x > x_lim){
+        return x_lim;
+    }
+
+    if(x < -1*x_lim){
+        return -1*x_lim;
+    }
+
+    return x;
+}
+
+void dq_pi(float ref_d, float ref_q, float y_d, float y_q, float* Ud, float* Uq){
+
+    static float err_int_d, err_int_q;
+    //float Ts = 0.006;
+
+    float err_d, err_q;
+    float Kp,Ki;
+
+    Kp = 0.03;
+    Ki = 0.09;
+
+    err_d = ref_d - y_d;
+    err_q = ref_q - y_q;
 
 
+    *Ud = Kp*err_d + Ki*err_int_d;
+    *Uq = Kp*err_q + Ki*err_int_q;
+
+    *Ud = saturation(*Ud,1.0);
+    *Uq = saturation(*Uq,1.0);
+
+    if(abs(*Ud)<1.0 && abs(*Uq)<1.0){
+        err_int_d += err_d*Ts;
+        err_int_q += err_q*Ts;
+    }
 
 
+}
 
 volatile void current_ctrl(CurrCtrl_IN * in, CurrCtrl_OUT * out){
 
     float d,q;
+    float Ud,Uq;
+    static int step;
+    float refq;
 
-    elec_offset_search(in,out);
+    //elec_offset_search(in,out);
 
+    step += 1;
+    if(step>1000){
+        refq = 0.1337;
+    }else{
+        refq = 0.0;
+    }
 
     park_trafo(in->Iu,in->Iv, in->Iw,&d,&q);
 
-    //out->debug2 = d;
-    //out->debug3 = q;
+    dq_pi(0.0,refq,d,q,&Ud,&Uq);
+
+    inv_park_trafo(Ud,Uq,&out->phase_U,&out->phase_V,&out->phase_W);
+
+    out->debug0 = d;
+    out->debug1 = q;
+
+    out->debug2 = Ud;
+    out->debug3 = Uq;
 
 }
 

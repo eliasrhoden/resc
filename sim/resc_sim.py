@@ -241,7 +241,7 @@ def main():
 
     TS = 0.00066
     print("Running sim")
-    Y = sim(mtr, TS, N_sc=5,N_tg=10,Tf=18,resc=resc)
+    Y = sim(mtr, TS, N_sc=5,N_tg=10,Tf=10,resc=resc)
     print(Y.shape)
 
     plot_sim_res((Y))
