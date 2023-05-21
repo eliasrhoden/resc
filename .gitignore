@@ -9,3 +9,5 @@
 *.so
 
 ./Debug/*
+
+*.pyc
