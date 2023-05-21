@@ -12,17 +12,18 @@ class CurrCtrl_IN(c.Structure):
                 ('Iu',c.c_float),('Iv',c.c_float),('Iw',c.c_float)]
 
 class CurrCtrl_OUT(c.Structure):
-    _fields_ = [('phase_U',c.c_float), ('phase_V', c.c_float), ('phase_W', c.c_float), 
+    _fields_ = [('phase_U',c.c_float), ('phase_V', c.c_float), ('phase_W', c.c_float),
                 ('debug0', c.c_float),('debug1', c.c_float),('debug2', c.c_float),('debug3', c.c_float) ]
 
 # ServoCtrl.h
 class ServoCtrl_IN(c.Structure):
-    _fields_ = [('rotor_ang',c.c_float), ('ref_acc', c.c_float),
+    _fields_ = [('encoder_ang',c.c_float), ('ref_acc', c.c_float),
                 ('ref_vel',c.c_float), ('ref_pos', c.c_float),
                 ('servo_ctrl_cmd',c.c_int)]
 
 class ServoCtrl_OUT(c.Structure):
-    _fields_ = [('ref_Id',c.c_float), ('ref_Iq', c.c_float), ('rotor_vel', c.c_float) ]
+    _fields_ = [('ref_Id',c.c_float), ('ref_Iq', c.c_float), ('rotor_ang', c.c_float), ('rotor_vel', c.c_float),
+    ('debug0', c.c_float), ('debug1', c.c_float),('debug2', c.c_float),('debug3', c.c_float),('debug4', c.c_float)]
 
 # TrajGen.h
 class TrajGen_IN(c.Structure):
@@ -35,7 +36,7 @@ class TrajGen_OUT(c.Structure):
 class RescTasks(typing.Protocol):
     def current_ctrl(self,inp:CurrCtrl_IN, out:CurrCtrl_OUT):
         pass
-    
+
     def servo_ctrl(self, inp:ServoCtrl_IN, out:ServoCtrl_OUT):
         pass
 
@@ -51,7 +52,7 @@ class C_Functions:
 
     def current_ctrl(self,inp:CurrCtrl_IN, out:CurrCtrl_OUT):
         self.dll.current_ctrl(c.byref(inp),c.byref(out))
-    
+
     def servo_ctrl(self, inp:ServoCtrl_IN, out:ServoCtrl_OUT):
         self.dll.servo_ctrl(c.byref(inp), c.byref(out))
 

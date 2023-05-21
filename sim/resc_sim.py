@@ -85,7 +85,7 @@ def sim(mtr:Motor, ts, N_sc, N_tg, Tf,resc:RescTasks):
     traj_out = c_functions.TrajGen_OUT(0.0,0.0,0.0)
 
     servo_in = c_functions.ServoCtrl_IN(0.0,0.0,0.0,0.0,0)
-    servo_out = c_functions.ServoCtrl_OUT(0.0,0.0,0.0)
+    servo_out = c_functions.ServoCtrl_OUT(0.0,0.0,0.0,0.0)
 
     curr_in = c_functions.CurrCtrl_IN(0.0,0.0,0.0,0.0,0)
     curr_out = c_functions.CurrCtrl_OUT(0.0,0.0,0.0,0.0)
@@ -112,14 +112,14 @@ def sim(mtr:Motor, ts, N_sc, N_tg, Tf,resc:RescTasks):
             servo_in.ref_acc = traj_out.ref_acc
             servo_in.ref_vel = traj_out.ref_vel
             servo_in.ref_pos = traj_out.ref_pos
-            servo_in.rotor_ang = wrap_angle(theta + np.deg2rad(13.37))
+            servo_in.encoder_ang = wrap_angle(theta + np.deg2rad(13.37))
             resc.servo_ctrl(servo_in, servo_out)
 
         if curr_in.current_ctrl_cmd == 2:
             servo_out.ref_Id = 0
             servo_out.ref_Iq = 0.1
 
-        curr_in.rotor_ang = servo_in.rotor_ang
+        curr_in.rotor_ang = servo_out.rotor_ang
         curr_in.rotor_vel = servo_out.rotor_vel
 
         curr_in.Iu = IU
@@ -147,7 +147,9 @@ def sim(mtr:Motor, ts, N_sc, N_tg, Tf,resc:RescTasks):
         Ud,Uq = park_trafo(UU, UV, UW, theta_elec)
         T = mtr.current_torque(Id, Iq)
 
-        signal_log.append([ti, Id, Iq, omega,T,UU,UV,UW,theta,IU,IV,IW,curr_out.debug0,curr_out.debug1,curr_out.debug2,curr_out.debug3])
+        signal_log.append([ti, Id, Iq, omega,T,UU,UV,UW,theta,IU,IV,IW,
+                        curr_out.debug0,curr_out.debug1,curr_out.debug2,curr_out.debug3,
+                        servo_out.debug0,servo_out.debug1,servo_out.debug2,servo_out.debug3,servo_out.debug4])
 
         # ode-scipy
         def ode_f(t,y):
@@ -212,11 +214,20 @@ def plot_sim_res(Y):
     plt.legend()
 
     plt.figure()
-    plt.title("Debug floats")
+    plt.title("Current ctrl - Debug floats")
     plt.plot(t,Y[:,12],label='Debug0')
     plt.plot(t,Y[:,13],label='Debug1')
     plt.plot(t,Y[:,14],label='Debug2')
     plt.plot(t,Y[:,15],label='Debug3')
+    plt.legend()
+
+    plt.figure()
+    plt.title("Servo ctrl - Debug floats")
+    plt.plot(t,Y[:,16],label='Debug0')
+    plt.plot(t,Y[:,17],label='Debug1')
+    plt.plot(t,Y[:,18],label='Debug2')
+    plt.plot(t,Y[:,19],label='Debug3')
+    plt.plot(t,Y[:,20],label='Debug3')
     plt.legend()
 
 def main():

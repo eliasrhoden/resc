@@ -104,7 +104,7 @@ void elec_offset_search(CurrCtrl_IN * in, CurrCtrl_OUT * out){
             elec_offs -= no_elec_periods*pole_div;
 
             //out->debug0 = elec_offs*rad2deg;
-            //out->debug1 = n_polepairs;
+            out->debug1 = elec_offs;
 
 
         }
@@ -122,7 +122,7 @@ void elec_offset_search(CurrCtrl_IN * in, CurrCtrl_OUT * out){
 
 
     out->debug0 = elec_theta;
-    out->debug1 = in->rotor_ang;
+    //out->debug1 = in->rotor_ang;
 
 
     if(elec_search_status== 1 || elec_search_status == 2){
@@ -159,8 +159,8 @@ volatile void current_ctrl(CurrCtrl_IN * in, CurrCtrl_OUT * out){
 
     park_trafo(in->Iu,in->Iv, in->Iw,&d,&q);
 
-    out->debug2 = d;
-    out->debug3 = q;
+    //out->debug2 = d;
+    //out->debug3 = q;
 
 }
 
