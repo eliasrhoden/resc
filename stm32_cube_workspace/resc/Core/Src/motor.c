@@ -42,6 +42,12 @@ extern EncoderSignals encoder;
 CurrCtrl_IN cc_in;
 CurrCtrl_OUT cc_out;
 
+ServoCtrl_IN sc_in;
+ServoCtrl_OUT sc_out;
+
+TrajGen_IN tg_in;
+TrajGen_OUT tg_out;
+
 void mtr_init(){
 
 	// MTR Voltage PWM
@@ -129,8 +135,10 @@ void mtr_current_ctrl_step(void){
 	cc_in.ref_Id = 0;
 	cc_in.ref_Iq = 0;
 
-	cc_in.rotor_ang = encoder.angle;
-	cc_in.rotor_vel = encoder.velocity;
+	//cc_in.rotor_ang = encoder.angle;
+	//cc_in.rotor_vel = encoder.velocity;
+	cc_in.rotor_ang = sc_out.rotor_ang;
+	cc_in.rotor_vel = sc_out.rotor_vel;
 
 	current_ctrl(&cc_in, &cc_out);
 
@@ -155,6 +163,15 @@ void mtr_current_ctrl_step(void){
 	mtr_set_U(mtr_voltages.U);
 	mtr_set_V(mtr_voltages.V);
 	mtr_set_W(mtr_voltages.W);
+
+}
+
+
+
+void mtr_servo_ctrl_step(void){
+	sc_in.encoder_ang = encoder.angle;
+
+	servo_ctrl(&sc_in,&sc_out);
 
 }
 

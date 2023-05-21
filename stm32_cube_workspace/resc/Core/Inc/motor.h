@@ -13,7 +13,10 @@
 #include "math.h"
 #include "logger.h"
 #include "encoder.h"
+
 #include "CurrentCtrl.h"
+#include "ServoCtrl.h"
+#include "TrajGen.h"
 
 
 typedef struct{

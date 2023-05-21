@@ -779,7 +779,8 @@ void start_servo_task(void *argument)
 	encoder_update();
 	update_log_signal(encoder.angle, 0);
 	update_log_signal(encoder.velocity, 1);
-	osDelay(4);
+
+	osDelay(5);
   }
   /* USER CODE END start_servo_task */
 }
