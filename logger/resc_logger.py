@@ -103,6 +103,7 @@ def main():
         ports = tools.comports()
         for p in ports:
             port = p.name
+			#115200
             with serial.Serial(port, 115200, timeout=0.3) as ser:
 
                 found_token = did_we_reviece_token(ser,'glenn') #'glenn

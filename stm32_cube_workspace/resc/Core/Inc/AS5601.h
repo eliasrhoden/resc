@@ -10,7 +10,7 @@
 #ifndef INC_AS5601_H_
 #define INC_AS5601_H_
 
-#include "cmsis_os.h"
+//#include "cmsis_os.h"
 #include "stm32f4xx_hal.h"
 
 #define AS5_I2C_ADDR 0x36

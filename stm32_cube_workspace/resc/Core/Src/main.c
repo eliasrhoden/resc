@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -50,30 +49,10 @@ I2C_HandleTypeDef hi2c1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim5;
+TIM_HandleTypeDef htim6;
 
 UART_HandleTypeDef huart2;
 
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityBelowNormal1,
-};
-/* Definitions for logging_task */
-osThreadId_t logging_taskHandle;
-const osThreadAttr_t logging_task_attributes = {
-  .name = "logging_task",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal,
-};
-/* Definitions for servo_task */
-osThreadId_t servo_taskHandle;
-const osThreadAttr_t servo_task_attributes = {
-  .name = "servo_task",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -89,10 +68,7 @@ static void MX_TIM2_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_TIM5_Init(void);
 static void MX_TIM3_Init(void);
-void StartDefaultTask(void *argument);
-void start_logging_task(void *argument);
-void start_servo_task(void *argument);
-
+static void MX_TIM6_Init(void);
 /* USER CODE BEGIN PFP */
 
 
@@ -153,60 +129,25 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM5_Init();
   MX_TIM3_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
   mtr_init();
   mtr_set_U(0.5);
   mtr_set_W(0.5);
   mtr_set_V(0.5);
-  encoder_init();
-
 
   HAL_TIM_Base_Start_IT(&htim3);
+  HAL_TIM_Base_Start_IT(&htim6);
+
+  encoder_init();
+  logger_init(&huart2);
+
+
+
 
   /* USER CODE END 2 */
 
-  /* Init scheduler */
-  osKernelInitialize();
-
-  /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
-
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
-
-  /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
-  /* USER CODE END RTOS_TIMERS */
-
-  /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
-  /* USER CODE END RTOS_QUEUES */
-
-  /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
-
-  /* creation of logging_task */
-  logging_taskHandle = osThreadNew(start_logging_task, NULL, &logging_task_attributes);
-
-  /* creation of servo_task */
-  servo_taskHandle = osThreadNew(start_servo_task, NULL, &servo_task_attributes);
-
-  /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
-  /* USER CODE END RTOS_THREADS */
-
-  /* USER CODE BEGIN RTOS_EVENTS */
-  /* add events, ... */
-  /* USER CODE END RTOS_EVENTS */
-
-  /* Start scheduler */
-  osKernelStart();
-
-  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -551,7 +492,7 @@ static void MX_TIM3_Init(void)
   htim3.Init.Prescaler = 0;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim3.Init.Period = 30000;
-  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV2;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
   {
@@ -642,6 +583,44 @@ static void MX_TIM5_Init(void)
 }
 
 /**
+  * @brief TIM6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM6_Init(void)
+{
+
+  /* USER CODE BEGIN TIM6_Init 0 */
+
+  /* USER CODE END TIM6_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM6_Init 1 */
+
+  /* USER CODE END TIM6_Init 1 */
+  htim6.Instance = TIM6;
+  htim6.Init.Prescaler = 1000;
+  htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim6.Init.Period = 90;
+  htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM6_Init 2 */
+
+  /* USER CODE END TIM6_Init 2 */
+
+}
+
+/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -722,69 +701,6 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartDefaultTask */
-/**
-  * @brief  Function implementing the defaultTask thread.
-  * @param  argument: Not used
-  * @retval None
-  */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
-{
-  /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-	vTaskDelay(500/portTICK_RATE_MS);
-	for(;;){
-		//INF
-		vTaskDelay(5000/portTICK_RATE_MS);
-	}
-
-  /* USER CODE END 5 */
-}
-
-/* USER CODE BEGIN Header_start_logging_task */
-/**
-* @brief Function implementing the logging_task thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_start_logging_task */
-void start_logging_task(void *argument)
-{
-  /* USER CODE BEGIN start_logging_task */
-
-	logger_task(&huart2);
-
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(10000);
-  }
-  /* USER CODE END start_logging_task */
-}
-
-/* USER CODE BEGIN Header_start_servo_task */
-/**
-* @brief Function implementing the servo_task thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_start_servo_task */
-void start_servo_task(void *argument)
-{
-  /* USER CODE BEGIN start_servo_task */
-  /* Infinite loop */
-  for(;;)
-  {
-	encoder_update();
-	update_log_signal(encoder.angle, 0);
-	update_log_signal(encoder.velocity, 1);
-
-	osDelay(5);
-  }
-  /* USER CODE END start_servo_task */
-}
-
 /**
   * @brief  Period elapsed callback in non blocking mode
   * @note   This function is called  when TIM1 interrupt took place, inside
@@ -802,6 +718,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
+
+  if (htim->Instance == TIM3) {
+    mtr_current_ctrl_step();
+  }
+
+  if (htim->Instance == TIM6) {
+    mtr_servo_ctrl_step();
+  }
 
   /* USER CODE END Callback 1 */
 }

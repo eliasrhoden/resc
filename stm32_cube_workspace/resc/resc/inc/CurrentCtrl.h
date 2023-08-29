@@ -4,6 +4,8 @@
 
 #include "ServoCtrl.h"
 
+#include "math.h"
+
 typedef struct{
 	float ref_Id,ref_Iq;
 	float rotor_ang;

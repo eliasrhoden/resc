@@ -42,5 +42,6 @@ void mtr_set_W(float duty);
 void mtr_search_zero();
 void slave_timer_callback(TIM_HandleTypeDef *htim);
 void mtr_current_ctrl_step(void);
+void mtr_servo_ctrl_step(void);
 
 #endif /* INC_MOTOR_H_ */

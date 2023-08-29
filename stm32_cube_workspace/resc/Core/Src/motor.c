@@ -146,6 +146,12 @@ void mtr_current_ctrl_step(void){
 	mtr_voltages.V = cc_out.phase_V;
 	mtr_voltages.W = cc_out.phase_W;
 
+
+	update_log_signal(mtr_currents.U, 2);
+	update_log_signal(mtr_currents.V, 3);
+	update_log_signal(mtr_currents.W, 4);
+
+	/*
 	update_log_signal(mtr_currents.U, 2);
 	update_log_signal(mtr_currents.V, 3);
 	update_log_signal(mtr_currents.W, 4);
@@ -158,7 +164,7 @@ void mtr_current_ctrl_step(void){
 	update_log_signal(cc_out.debug1, 9);
 	update_log_signal(cc_out.debug2, 10);
 	update_log_signal(cc_out.debug3, 11);
-
+*/
 	// Set voltage to PWM
 	mtr_set_U(mtr_voltages.U);
 	mtr_set_V(mtr_voltages.V);

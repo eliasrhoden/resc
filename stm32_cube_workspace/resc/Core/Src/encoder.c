@@ -40,16 +40,6 @@ void encoder_set_zero(){
 	encoder_calibrated = 1;
 }
 
-void encoder_task(){
-
-	while(1){
-
-		encoder_update();
-
-		vTaskDelay(1.0/portTICK_PERIOD_MS);
-
-	}
-}
 
 void encoder_update(){
 

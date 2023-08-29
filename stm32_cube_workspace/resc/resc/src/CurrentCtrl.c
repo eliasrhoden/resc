@@ -176,7 +176,7 @@ void dq_pi(float ref_d, float ref_q, float y_d, float y_q, float* Ud, float* Uq)
     *Ud = saturation(*Ud,1.0);
     *Uq = saturation(*Uq,1.0);
 
-    if(abs(*Ud)<1.0 && abs(*Uq)<1.0){
+    if(fabs(*Ud)<1.0 && fabs(*Uq)<1.0){
         err_int_d += err_d*Ts;
         err_int_q += err_q*Ts;
     }
