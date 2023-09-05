@@ -49,7 +49,7 @@ def start_logging(ser):
     logging_active = True 
 
     data = []
-    ser.timeout = 4.0
+    ser.timeout = 7.0
     while logging_active:
 
         try:
@@ -58,7 +58,8 @@ def start_logging(ser):
 
             data.append(row)
         except struct.error as e:
-            print('eee')
+            print('Failed to unpack bytes')
+            print(row)
             print(e)
             print("Connection lost")
             logging_active = False

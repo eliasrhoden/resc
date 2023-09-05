@@ -133,6 +133,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   mtr_init();
+  encoder_init();
   mtr_set_U(0.5);
   mtr_set_W(0.5);
   mtr_set_V(0.5);
@@ -140,10 +141,9 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim3);
   HAL_TIM_Base_Start_IT(&htim6);
 
-  encoder_init();
   logger_init(&huart2);
 
-
+  encoder_update();
 
 
   /* USER CODE END 2 */
@@ -489,7 +489,7 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 0;
+  htim3.Init.Prescaler = 2;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim3.Init.Period = 30000;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV2;
@@ -602,7 +602,7 @@ static void MX_TIM6_Init(void)
   htim6.Instance = TIM6;
   htim6.Init.Prescaler = 1000;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 90;
+  htim6.Init.Period = 360;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {

@@ -191,20 +191,20 @@ volatile void current_ctrl(CurrCtrl_IN * in, CurrCtrl_OUT * out){
     static int step;
     float refq;
 
-    //elec_offset_search(in,out);
+    elec_offset_search(in,out);
 
-    step += 1;
-    if(step>1000){
-        refq = 0.1337;
-    }else{
-        refq = 0.0;
-    }
+    //step += 1;
+    //if(step>1000){
+    //    refq = 0.1337;
+    //}else{
+    //    refq = 0.0;
+    //}
 
     park_trafo(in->Iu,in->Iv, in->Iw,&d,&q);
 
-    dq_pi(0.0,refq,d,q,&Ud,&Uq);
+    //dq_pi(0.0,refq,d,q,&Ud,&Uq);
 
-    inv_park_trafo(Ud,Uq,&out->phase_U,&out->phase_V,&out->phase_W);
+    //inv_park_trafo(Ud,Uq,&out->phase_U,&out->phase_V,&out->phase_W);
 
     out->debug0 = d;
     out->debug1 = q;

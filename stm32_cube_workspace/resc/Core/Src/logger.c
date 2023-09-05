@@ -18,7 +18,7 @@ LogSample log_buffer1[buffer_size];
 
 LogSample *active_buffer;
 int buffer_index = 0;
-int log_index = 0;
+uint32_t log_index = 0;
 
 volatile uint8_t logging_state = 0;
 volatile uint8_t waiting_for_host = 1;
@@ -72,6 +72,12 @@ void wait_for_host() {
 void logger_init(UART_HandleTypeDef *uart_handle) {
 
 	uart = uart_handle;
+	active_buffer = log_buffer0;
+	buffer_index = 0;
+	log_index = 0;
+
+
+
 
 	wait_for_host();
 
@@ -87,32 +93,40 @@ void logger_init(UART_HandleTypeDef *uart_handle) {
 
 	}
 
-	uint32_t tick_timestamp;
-
-	active_buffer = log_buffer0;
-	buffer_index = 0;
 	logging_started = 1;
 
 }
+
+
+uint8_t glenn = 0;
 
 void logger_step(void) {
 	/*
 	 * Called by a timer interupt
 	 * */
 
+
+	if(glenn == 1){
+		glenn = 2;
+	}
+	glenn = 1;
+
 	current_sample.tic = tic;
 
-	memcpy(active_buffer + log_index, &current_sample, sizeof(LogSample));
+
 
 	if(logging_started){
+
+		memcpy(active_buffer + log_index, &current_sample, sizeof(current_sample));
+
 		log_index += 1;
 		tic += 1;
 	}
 
 	if (log_index >= buffer_size) {
 		// Send buffer in non-blocking mode
-		HAL_UART_Transmit_IT(uart, (uint8_t*) active_buffer,
-				sizeof(LogSample) * buffer_size);
+		//HAL_UART_Transmit_IT(uart, (uint8_t*) active_buffer,
+		//		sizeof(LogSample) * buffer_size);
 		if (buffer_index == 0) {
 			active_buffer = log_buffer1;
 			buffer_index = 1;
@@ -122,7 +136,7 @@ void logger_step(void) {
 		}
 		log_index = 0;
 	}
-
+	glenn = 0;
 }
 
 void update_log_signal(float value, int index) {

@@ -80,23 +80,6 @@ void mtr_init(){
 
 
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
-
-	//if (hadc == &hadc1){
-		adc_U_phase = HAL_ADC_GetValue(&hadc1);
-	//}
-	//if (hadc == &hadc2){
-		adc_V_phase = HAL_ADC_GetValue(&hadc2);
-	//}
-
-	//if (hadc == &hadc3){
-		adc_W_phase = HAL_ADC_GetValue(&hadc3);
-	//}
-
-}
-
-
-
 float limit_duty(float duty){
 	if(duty > max_duty){
 		duty = max_duty;
@@ -118,6 +101,12 @@ uint8_t edge = 0;
 void mtr_current_ctrl_step(void){
 
 	// 0.66 ms
+
+
+	// Read ADC
+	adc_U_phase = HAL_ADC_GetValue(&hadc1);
+	adc_V_phase = HAL_ADC_GetValue(&hadc2);
+	adc_W_phase = HAL_ADC_GetValue(&hadc3);
 
 	// Convert ADC to currents
 	mtr_currents.U = adc_U_phase;
@@ -175,6 +164,7 @@ void mtr_current_ctrl_step(void){
 
 
 void mtr_servo_ctrl_step(void){
+	encoder_update();
 	sc_in.encoder_ang = encoder.angle;
 
 	servo_ctrl(&sc_in,&sc_out);

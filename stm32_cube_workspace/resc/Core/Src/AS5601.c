@@ -11,13 +11,57 @@
 
 
 I2C_HandleTypeDef * i2c;
+uint8_t send_buffer[4];
+uint8_t rec_buffer[4];
+AS5_OUTPUT output;
+
+uint8_t state = 0;
+uint8_t angle_reg = 0x0C;
 
 
 void as5601_init(I2C_HandleTypeDef * i2c_handler){
 	i2c = i2c_handler;
 	set_update_rate(0xFF);
 	set_zero_power_mode();
+	state = 0;
+
 }
+
+
+void as5601_start_reading_angle(void){
+
+	if(state == 0){
+
+		HAL_I2C_Master_Transmit_IT(i2c, AS5_I2C_WRITE_ADDR, &angle_reg, 1);
+		state = 1;
+	}
+
+
+}
+
+
+void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+
+	// Finished sending the angle-register address, now we request to read angle value
+	HAL_I2C_Master_Receive_IT(i2c, AS5_I2C_READ_ADDR, rec_buffer, 4);
+	state = 2;
+}
+
+
+
+
+void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c){
+
+	// Raw is the first 2 bytes
+	output.raw_angle = get_int_from_2bytes(rec_buffer);
+
+	// Clean angle is the second 2 bytes
+	output.angle = get_int_from_2bytes(rec_buffer+2);
+	state = 0;
+
+}
+
 
 /**
  * @brief Reads the values of a register on the AS5601 over I2C
@@ -95,7 +139,14 @@ void read_output_old(AS5_OUTPUT * output){
 
 }
 
-void read_output(AS5_OUTPUT * output){
+void read_output(AS5_OUTPUT * output_caller){
+
+	memcpy(output_caller, &output, sizeof(output));
+
+}
+
+
+void read_output222(AS5_OUTPUT * output){
 
 	// This takes approx 0.8ms
 
@@ -118,6 +169,54 @@ void read_output(AS5_OUTPUT * output){
 }
 
 void read_conf(AS5_CONF * conf){
+
+	uint8_t tmp_stat, stat;
+	uint8_t buffer[4];
+
+	// Zero status of all reads
+	stat = 0;
+
+	stat = read_bytes(0x00, 3, buffer);
+
+	// Nr of zero pos writes
+	conf->nr_zero_writes = buffer[0] & 0x3;
+
+	// Zero pos
+	conf->zero_pos = get_int_from_2bytes(buffer+1);
+
+	// Slow filter
+	tmp_stat = read_bytes(0x07, 3, buffer);
+	stat |= tmp_stat << 2;
+	conf->slow_filter = buffer[0] & 0x3;
+
+	// Fast filter
+	conf->fast_filter = (buffer[0] & (0x7 << 2)) >> 2;
+
+	// Watchdog
+	conf->watchdog_timer = (buffer[0] & (0x1 << 5)) > 0;
+
+	// Powermode
+	conf->power_mode = buffer[1] & 0x3;
+
+	//Hysteresis
+	conf->hyster = (buffer[1] & (0x3<<2)) >> 2;
+
+	// ABN/Update rate
+	conf->output_update_rate = buffer[2] & 0xF;
+
+	// Push threshold
+	tmp_stat = read_bytes(0x0A, 1, buffer);
+	stat |= tmp_stat << 3;
+	conf->push_thr = buffer[0];
+
+	if (stat != 0xF){
+		// Error handler...
+	}
+
+}
+
+
+void read_conf_old(AS5_CONF * conf){
 
 	uint8_t tmp_stat, stat;
 	uint8_t buffer[4];
@@ -165,6 +264,7 @@ void read_conf(AS5_CONF * conf){
 	}
 
 }
+
 
 /**
  * Sets the update rate of the module

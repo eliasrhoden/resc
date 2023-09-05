@@ -12,6 +12,7 @@
 
 //#include "cmsis_os.h"
 #include "stm32f4xx_hal.h"
+#include "string.h"
 
 #define AS5_I2C_ADDR 0x36
 #define AS5_I2C_READ_ADDR (AS5_I2C_ADDR<<1) | 0x1
@@ -46,10 +47,12 @@ typedef struct{
 
 
 void as5601_init(I2C_HandleTypeDef * i2c_handler);
+void as5601_start_reading_angle(void);
 void read_status(AS5_STATUS * status);
 void read_output(AS5_OUTPUT * output);
 void read_conf(AS5_CONF * conf);
 void set_zero_power_mode();
 void set_update_rate(uint8_t rate);
+uint16_t get_int_from_2bytes(uint8_t *pdata);
 
 #endif /* INC_AS5601_H_ */

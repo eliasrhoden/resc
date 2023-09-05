@@ -29,8 +29,8 @@ void encoder_init(){
 	as5601_init(&hi2c1);
 	read_status(&status);
 	read_conf(&conf);
-
-
+	old_angle = 0;
+	//HAL_I2C_DeInit(&hi2c1);
 
 }
 
@@ -45,13 +45,15 @@ void encoder_update(){
 
 	AS5_OUTPUT out;
 	float ts = 0.0005;
-
+	as5601_start_reading_angle();
 	read_output(&out);
 
 	uint16_t pulse_count = out.raw_angle;
-	encoder.angle = pulse_count * 1.0/encoder_pulses_per_rev * 2*PI;
+	encoder.angle = pulse_count;// * 1.0/encoder_pulses_per_rev * 2*PI;
 	encoder.velocity = (encoder.angle - old_angle)*1/ts;
 	old_angle = encoder.angle;
+
+	update_log_signal(encoder.angle, 0);
 
 }
 
