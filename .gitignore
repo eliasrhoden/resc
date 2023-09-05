@@ -11,3 +11,5 @@
 ./Debug/*
 
 *.pyc
+
+log_*
