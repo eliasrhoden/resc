@@ -106,7 +106,8 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+
+	HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -143,7 +144,7 @@ int main(void)
 
   logger_init(&huart2);
 
-  encoder_update();
+  //encoder_update();
 
 
   /* USER CODE END 2 */

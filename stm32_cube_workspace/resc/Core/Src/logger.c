@@ -16,7 +16,7 @@ LogSample current_sample;
 LogSample log_buffer0[buffer_size];
 LogSample log_buffer1[buffer_size];
 
-LogSample *active_buffer;
+LogSample *active_buffer_logz;
 int buffer_index = 0;
 uint32_t log_index = 0;
 
@@ -72,7 +72,7 @@ void wait_for_host() {
 void logger_init(UART_HandleTypeDef *uart_handle) {
 
 	uart = uart_handle;
-	active_buffer = log_buffer0;
+	active_buffer_logz = log_buffer0;
 	buffer_index = 0;
 	log_index = 0;
 
@@ -98,26 +98,69 @@ void logger_init(UART_HandleTypeDef *uart_handle) {
 }
 
 
-uint8_t glenn = 0;
+
 
 void logger_step(void) {
 	/*
 	 * Called by a timer interupt
 	 * */
 
+	//current_sample.tic = tic;
 
-	if(glenn == 1){
-		glenn = 2;
+	if(logging_started){
+
+
+		if (buffer_index == 0) {
+			log_buffer0[log_index].tic = tic;
+		}
+		else{
+			log_buffer1[log_index].tic = tic;
+		}
+
+		log_index += 1;
+		tic += 1;
+
+		if (log_index >= buffer_size) {
+			// Send buffer in non-blocking mode
+
+			if (buffer_index == 0) {
+				HAL_UART_Transmit_IT(uart, (uint8_t*) log_buffer0,
+						sizeof(LogSample) * (buffer_size));
+
+				buffer_index = 1;
+			} else {
+				HAL_UART_Transmit_IT(uart, (uint8_t*) log_buffer1,
+						sizeof(LogSample) *  (buffer_size));
+
+				buffer_index = 0;
+			}
+			log_index = 0;
+		}
+
+
 	}
-	glenn = 1;
 
+
+
+}
+
+
+void logger_step2(void) {
+	/*
+	 * Called by a timer interupt
+	 * */
+
+
+	// Guess I will never know why the first LogSample in active_buffer_logz always get messed up....
+	// If I disable TIM3 interrupt the problem seems to be gone
+	// Will do a hard-coded- version instead just to move on
 	current_sample.tic = tic;
 
 
 
 	if(logging_started){
 
-		memcpy(active_buffer + log_index, &current_sample, sizeof(current_sample));
+		memcpy(active_buffer_logz + log_index, &current_sample, sizeof(current_sample));
 
 		log_index += 1;
 		tic += 1;
@@ -125,25 +168,34 @@ void logger_step(void) {
 
 	if (log_index >= buffer_size) {
 		// Send buffer in non-blocking mode
-		//HAL_UART_Transmit_IT(uart, (uint8_t*) active_buffer,
+		//HAL_UART_Transmit_IT(uart, (uint8_t*) active_buffer_logz,
 		//		sizeof(LogSample) * buffer_size);
 		if (buffer_index == 0) {
-			active_buffer = log_buffer1;
+			active_buffer_logz = log_buffer1;
 			buffer_index = 1;
 		} else {
-			active_buffer = log_buffer0;
+			active_buffer_logz = log_buffer0;
 			buffer_index = 0;
 		}
 		log_index = 0;
 	}
-	glenn = 0;
+
 }
 
 void update_log_signal(float value, int index) {
 	// Float is atomic so currnently there is no need
 	// for a sempahore here. double -> 64bits -> two words -> not atomic!
-	current_sample.signals[index] = value;
 
+	// Guess I don't know how pointers works after all...
+
+	//current_sample.signals[index] = value;
+
+	if (buffer_index == 0) {
+		log_buffer0[log_index].signals[index] = value;
+	}
+	else{
+		log_buffer1[log_index].signals[index] = value;
+	}
 }
 //#endif
 
