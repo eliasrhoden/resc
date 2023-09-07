@@ -225,7 +225,7 @@ void TIM3_IRQHandler(void)
   /* USER CODE BEGIN TIM3_IRQn 0 */
 	// APB1 - 90 MHz
 	// Ts ~ 1.2 ms
-	//mtr_current_ctrl_step();
+	mtr_current_ctrl_step();
 
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);

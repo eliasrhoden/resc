@@ -18,6 +18,7 @@ extern I2C_HandleTypeDef hi2c1;
 int encoder_calibrated = 0;
 float old_angle = 0;
 
+
 AS5_STATUS status;
 AS5_CONF conf;
 

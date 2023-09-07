@@ -68,10 +68,6 @@ void mtr_init(){
 	HAL_ADC_Start_IT(&hadc2);
 	HAL_ADC_Start_IT(&hadc3);
 
-	//HAL_ADCEx_InjectedStart(&hadc1);
-	//HAL_ADCEx_InjectedStart(&hadc2);
-	//HAL_ADCEx_InjectedStart(&hadc3);
-
 	// PWM for ADC Trigger
 	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_2);
@@ -99,8 +95,6 @@ float speed_gain = 1;
 uint8_t edge = 0;
 
 void mtr_current_ctrl_step(void){
-
-	// 0.66 ms
 
 
 	// Read ADC
@@ -140,11 +134,6 @@ void mtr_current_ctrl_step(void){
 	update_log_signal(mtr_currents.V, 3);
 	update_log_signal(mtr_currents.W, 4);
 
-	/*
-	update_log_signal(mtr_currents.U, 2);
-	update_log_signal(mtr_currents.V, 3);
-	update_log_signal(mtr_currents.W, 4);
-
 	update_log_signal(mtr_voltages.U, 5);
 	update_log_signal(mtr_voltages.V, 6);
 	update_log_signal(mtr_voltages.W, 7);
@@ -153,7 +142,7 @@ void mtr_current_ctrl_step(void){
 	update_log_signal(cc_out.debug1, 9);
 	update_log_signal(cc_out.debug2, 10);
 	update_log_signal(cc_out.debug3, 11);
-*/
+
 	// Set voltage to PWM
 	mtr_set_U(mtr_voltages.U);
 	mtr_set_V(mtr_voltages.V);

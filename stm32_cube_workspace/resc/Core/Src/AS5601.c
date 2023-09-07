@@ -17,7 +17,7 @@ AS5_OUTPUT output;
 
 uint8_t state = 0;
 uint8_t angle_reg = 0x0C;
-
+int restart_count = 0;
 
 void as5601_init(I2C_HandleTypeDef * i2c_handler){
 	i2c = i2c_handler;
@@ -34,6 +34,13 @@ void as5601_start_reading_angle(void){
 
 		HAL_I2C_Master_Transmit_IT(i2c, AS5_I2C_WRITE_ADDR, &angle_reg, 1);
 		state = 1;
+		restart_count = 0;
+	}else{
+		restart_count += 1;
+		if(restart_count > 4){
+			state = 0;
+			restart_count = 0;
+		}
 	}
 
 

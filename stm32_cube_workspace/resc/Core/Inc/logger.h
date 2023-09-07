@@ -10,7 +10,7 @@
 
 #include "stm32f4xx_hal.h"
 #include <string.h>
-#define log_nr_signals 3
+#define log_nr_signals 15
 #define buffer_size 200
 
 typedef struct log_sample{
