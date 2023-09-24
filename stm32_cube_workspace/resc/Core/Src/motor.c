@@ -56,17 +56,17 @@ void mtr_init(){
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
 
 	// ADC Current measurement
-	//HAL_ADC_Start(&hadc1);
-	//HAL_ADC_Start(&hadc2);
-	//HAL_ADC_Start(&hadc3);
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_Start(&hadc2);
+	HAL_ADC_Start(&hadc3);
 
 	//HAL_ADCEx_InjectedStart_IT(&hadc1);
 	//HAL_ADCEx_InjectedStart_IT(&hadc2);
 	//HAL_ADCEx_InjectedStart_IT(&hadc3);
 
-	HAL_ADC_Start_IT(&hadc1);
-	HAL_ADC_Start_IT(&hadc2);
-	HAL_ADC_Start_IT(&hadc3);
+	//HAL_ADC_Start_IT(&hadc1);
+	//HAL_ADC_Start_IT(&hadc2);
+	//HAL_ADC_Start_IT(&hadc3);
 
 	// PWM for ADC Trigger
 	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1);
@@ -94,6 +94,16 @@ float theta = 0;
 float speed_gain = 1;
 uint8_t edge = 0;
 
+
+void clear_adc_regs(ADC_HandleTypeDef * adc){
+
+	// Since we only read in the current loop, there will be some "overrun", need to clear all registers so the adc can re-trigger
+
+	adc->Instance->SR &= ~((1<<5) | (1<<1)); // Clear OVR (b5) and EOC (b1)
+
+
+}
+
 void mtr_current_ctrl_step(void){
 
 
@@ -101,6 +111,11 @@ void mtr_current_ctrl_step(void){
 	adc_U_phase = HAL_ADC_GetValue(&hadc1);
 	adc_V_phase = HAL_ADC_GetValue(&hadc2);
 	adc_W_phase = HAL_ADC_GetValue(&hadc3);
+
+	clear_adc_regs(&hadc1);
+	clear_adc_regs(&hadc2);
+	clear_adc_regs(&hadc3);
+
 
 	// Convert ADC to currents
 	mtr_currents.U = adc_U_phase;
