@@ -37,8 +37,8 @@ UW = df['signal_7']
 
 deb0 = df['signal_8']
 deb1 = df['signal_9']
-deb2 = df['signal_10']
-deb3 = df['signal_11']
+#deb2 = df['signal_10']
+#deb3 = df['signal_11']
 
 plt.subplot(2,1,1)
 plt.title('Encoder')
@@ -65,7 +65,7 @@ plt.figure()
 plt.title('DEBUG')
 plt.plot(t_ms,deb0)
 plt.plot(t_ms,deb1)
-plt.plot(t_ms,deb2)
-plt.plot(t_ms,deb3)
+#plt.plot(t_ms,deb2)
+#plt.plot(t_ms,deb3)
 
 plt.show()
