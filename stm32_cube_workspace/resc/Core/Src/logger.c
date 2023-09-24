@@ -25,6 +25,7 @@ volatile uint8_t waiting_for_host = 1;
 volatile uint8_t waiting_to_send = 1;
 uint8_t logging_started = 0;
 uint32_t tic = 0;
+uint32_t overflow_in_send=0;
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	waiting_for_host = 0;
@@ -159,14 +160,21 @@ void logger_step(void) {
 		if (log_index >= buffer_size) {
 			// Send buffer in non-blocking mode
 
+			// Check fi previous send is completed
+			if(waiting_to_send){
+				overflow_in_send = 1;
+			}
+
+			waiting_to_send = 1;
 			if (buffer_index == 0) {
 				HAL_UART_Transmit_IT(uart, (uint8_t*) log_buffer0,
 						sizeof(LogSample) * (buffer_size));
 
 				buffer_index = 1;
 			} else {
+
 				HAL_UART_Transmit_IT(uart, (uint8_t*) log_buffer1,
-						sizeof(LogSample) *  (buffer_size));
+						sizeof(LogSample) * (buffer_size));
 
 				buffer_index = 0;
 			}

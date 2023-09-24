@@ -8,11 +8,13 @@ import struct
 import datetime
 import matplotlib.pyplot as plt
 
+baudrate = 115200
+
 def did_we_reviece_token(ser,token):
     port_ok = False
 
     x = ser.read(len(token))
-    print(x)
+    #print(x)
     try:
         port_ok = x.decode() == token
         if port_ok:
@@ -51,18 +53,21 @@ def start_logging(ser):
     print(nr_bytes)
     logging_active = True 
 
+    t_est = 1/baudrate*nr_bytes*8
+    print(f"Transmision time for 1 bufer: {t_est}s")
+
     data = []
-    ser.timeout = 7.0
+    ser.timeout = t_est + 0.5 #7
     while logging_active:
 
         try:
-            row = ser.read(nr_bytes)
-            row = struct.unpack(frmt,row)
-
+            row_bs = ser.read(nr_bytes)
+            row = struct.unpack(frmt,row_bs)
+            #print(len(row_bs))
             data.append(row)
         except struct.error as e:
             print('Failed to unpack bytes')
-            print(row)
+            print(len(row_bs))
             print(e)
             print("Connection lost")
             logging_active = False
@@ -76,7 +81,7 @@ def start_logging(ser):
     chunk_len = nr_floats + 1
     try:
         for row in data:
-            for c in range(buffer_size-1):
+            for c in range(buffer_size):
                 non_buff_data.append(row[c*chunk_len: (c+1)*chunk_len])
     except e: 
         print(e)
@@ -108,7 +113,7 @@ def main():
         for p in ports:
             port = p.name
 			#115200
-            with serial.Serial(port, 115200, timeout=0.3) as ser:
+            with serial.Serial(port, baudrate, timeout=0.3) as ser:
 
                 found_token = did_we_reviece_token(ser,'glenn') #'glenn
                 if found_token:
