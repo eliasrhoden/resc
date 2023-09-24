@@ -10,12 +10,15 @@ import matplotlib.pyplot as plt
 
 def did_we_reviece_token(ser,token):
     port_ok = False
-    
-    ser.write(ser.write('hepp'.encode('ascii')))
-    ser.flush()
+
     x = ser.read(len(token))
+    print(x)
     try:
         port_ok = x.decode() == token
+        if port_ok:
+            ser.write(ser.write('hepp'.encode('ascii')))
+            ser.flush()
+
     except:
         pass
     return port_ok

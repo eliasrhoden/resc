@@ -44,6 +44,42 @@ void wait_for_host() {
 	uint8_t resp[10];
 	char exp_resp[4] = "hepp";
 
+	HAL_StatusTypeDef status;
+
+
+	while(1){
+		// Try to send ping
+		while(1){
+			status = HAL_UART_Transmit(uart, ping, 5, 500);
+			if(status == HAL_OK){
+				break;
+			}
+		}
+
+		// See if host responds
+		status = HAL_UART_Receive(uart, resp, 4, 300);
+		if(status == HAL_OK){
+
+			char msg_ok = 1;
+
+			for (int i = 0; i < 4; i++) {
+				msg_ok &= resp[i] == exp_resp[i];
+			}
+
+			if(msg_ok){
+				break;
+			}
+		}
+	}
+}
+
+
+void wait_for_hostold() {
+
+	char ping[5] = "glenn";
+	uint8_t resp[10];
+	char exp_resp[4] = "hepp";
+
 	// Rec from host
 	waiting_for_host = 1;
 	HAL_UART_Receive_IT(uart, (uint8_t*) resp, 4);
