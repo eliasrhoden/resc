@@ -6,8 +6,6 @@
  */
 #include "encoder.h"
 #define encoder_pulses_per_rev 4095
-#include "logger.h"
-#include "AS5601.h"
 #define PI 3.14159265359f
 
 EncoderSignals encoder;
@@ -46,7 +44,7 @@ void encoder_update(){
 
 	AS5_OUTPUT out;
 	float ts = 0.0005;
-	as5601_start_reading_angle();
+	//as5601_start_reading_angle();
 	read_output(&out);
 
 	uint16_t pulse_count = out.raw_angle;
@@ -57,6 +55,8 @@ void encoder_update(){
 	update_log_signal(encoder.angle, 0);
 
 }
+
+
 
 
 

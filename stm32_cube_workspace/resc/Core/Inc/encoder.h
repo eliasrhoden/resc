@@ -9,6 +9,9 @@
 #define INC_ENCODER
 
 #include "stm32f4xx_hal.h"
+#include "logger.h"
+#include "AS5601.h"
+#include "debug_print.h"
 
 typedef struct encoder{
 	float angle;

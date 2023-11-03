@@ -34,6 +34,7 @@ extern "C" {
 #include "logger.h"
 #include "encoder.h"
 #include "motor.h"
+#include "debug_print.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

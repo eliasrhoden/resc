@@ -142,7 +142,7 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim6);
 
   logger_init(&huart2);
-
+  //debug_print_init(&huart2);
 
 
   /* USER CODE END 2 */

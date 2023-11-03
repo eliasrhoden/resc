@@ -9,16 +9,16 @@
 
 //#ifdef use_old_logger
 
-UART_HandleTypeDef *uart;
+static UART_HandleTypeDef *uart;
 
-LogSample current_sample;
+static LogSample current_sample;
 
-LogSample log_buffer0[buffer_size];
-LogSample log_buffer1[buffer_size];
+static LogSample log_buffer0[buffer_size];
+static LogSample log_buffer1[buffer_size];
 
-LogSample *active_buffer_logz;
-int buffer_index = 0;
-uint32_t log_index = 0;
+static LogSample *active_buffer_logz;
+static int buffer_index = 0;
+static uint32_t log_index = 0;
 
 volatile uint8_t logging_state = 0;
 volatile uint8_t waiting_for_host = 1;
