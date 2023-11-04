@@ -1,2 +1,0 @@
-loggs_230212_1637 - adc offset 50
-loggs_230212_1642 - offset 1000
