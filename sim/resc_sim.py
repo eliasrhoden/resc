@@ -3,11 +3,11 @@
 import numpy as np
 import dataclasses
 from scipy import integrate
-import typing
 import matplotlib.pyplot as plt
 import c_functions
 from c_functions import RescTasks
 from tqdm import tqdm
+import datetime
 
 @dataclasses.dataclass
 class Motor:
@@ -245,6 +245,12 @@ def main():
     print(Y.shape)
 
     plot_sim_res((Y))
+
+    if False:
+        time_str = datetime.datetime.now().strftime('%y%m%d_%H%M')
+        fname = r'logger\logs\sim_log_' + time_str + '.npy'
+        print('Saving as: ' + fname)
+        np.save(fname,Y)
 
     plt.show()
 
